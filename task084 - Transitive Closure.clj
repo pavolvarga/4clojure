@@ -4,48 +4,42 @@
 ;; Write a function which generates the transitive closure of a binary relation. The relation will be represented as a set of 2 item vectors.
 
 (defn gtc [s]
-	(let [find-relations (fn [p s]
-								(filter 
-									(fn [x]
-										(or (= (x 0) (p 1))
-											(= (x 1) (p 0))))
-									s
-								))
-		ctc				 (fn [p1 p2]
-							(if (=( p1 0) (p2 1))
-								[(p2 0) (p1 1)]
-								[(p1 0) (p2 1)]
-							))
-		tc				 (fn [p s]
-							(loop [s1 s result []]
-								(if (not-empty s1)
-									(recur 
-										(rest s1) 
-										(conj result (ctc p (first s1)))
-									)
-									result)
-								))
-		rtc				 (fn [s]
-							(loop [p (first s) r (rest s) result #{}]
-									(if (not-empty r)
-										(let [rels (find-relations p r)
-											  tcr  (tc p rels)]
-											(recur
-												(first r)
-												(rest r)
-												(if (empty? tcr) 
-													(conj result p) 
-													(into (conj result p) tcr)
-												)) 
-										)
-										(conj result p)
-									)))]
-	(loop [n 0, result (rtc s)]
-		(if (= n (-> s count dec))
-			result
-			(recur (inc n) (into result (rtc result)))
-		))
-	))
+  (let [find-relations  (fn [p s]
+                          (filter 
+                            (fn [x]
+                              (or (= (x 0) (p 1))
+                                (= (x 1) (p 0))))
+                            s))
+        ctc (fn [p1 p2]
+              (if (=( p1 0) (p2 1))
+                [(p2 0) (p1 1)]
+                [(p1 0) (p2 1)]))
+        tc  (fn [p s]
+              (loop [s1 s result []]
+                (if (not-empty s1)
+                  (recur 
+                    (rest s1) 
+                    (conj result (ctc p (first s1)))
+                  )
+                  result)))
+        rtc (fn [s]
+              (loop [p (first s) r (rest s) result #{}]
+                  (if (not-empty r)
+                    (let [rels (find-relations p r)
+                          tcr  (tc p rels)]
+                      (recur
+                        (first r)
+                        (rest r)
+                        (if (empty? tcr) 
+                          (conj result p) 
+                          (into (conj result p) tcr)
+                        )))
+                    (conj result p))))]
+    (loop [n 0, result (rtc s)]
+      (if (= n (-> s count dec))
+        result
+        (recur (inc n) (into result (rtc result)))
+      ))))
 
 ;; Tests
 

@@ -18,46 +18,40 @@
 (defn make-winner [i]
   (cond 
     (nil? i)
-    (fn win-from-rank [c]
-      (loop [c1 (rest c), win (first c)]
-        (if (empty? c1)
-          win
-          (let [f (first c1)]
-            (cond
-              (and (= (win :suit) (f :suit)) (> (f :rank) (win :rank))) 		(recur (rest c1) f) 
-              (and (= (win :suit) (f :suit)) (not (> (f :rank) (win :rank)))) 	(recur (rest c1) win) 
-              (and (not= (win :suit) (f :suit))) 								(recur (rest c1) win)
-              )))))
-    
+      (fn win-from-rank [c]
+        (loop [c1 (rest c), win (first c)]
+          (if (empty? c1)
+            win
+            (let [f (first c1)]
+              (cond
+                (and (= (win :suit) (f :suit)) (> (f :rank) (win :rank)))        (recur (rest c1) f) 
+                (and (= (win :suit) (f :suit)) (not (> (f :rank) (win :rank))))  (recur (rest c1) win) 
+                (and (not= (win :suit) (f :suit)))                               (recur (rest c1) win))))))
     (or (= i :spade) (= i :club) (= i :heart) (= i :diamond))
-    (fn win-from-suit [c]
-      (loop [c1 c, win nil]
-        (if (empty? c1)
-          win
-          (let [f (first c1)]
-            (cond
-              (and (= nil win)    (= i (f :suit)))    							      (recur (rest c1) f)
-              (and (= nil win)    (not= i (f :suit)))								  (recur (rest c1) win)
-              (and (not= nil win) (= i (f :suit))    (> (f :rank) (win :rank)))       (recur (rest c1) f)
-              (and (not= nil win) (= i (f :suit))    (not (> (f :rank) (win :rank)))) (recur (rest c1) win)
-              (and (not= nil win) (not= i (f :suit)))							      (recur (rest c1) win)
-              )))))
-    
-    (map? i)
-    (fn win-from-map [c]
-      (let [{suit :suit, rank :rank} i]
+      (fn win-from-suit [c]
         (loop [c1 c, win nil]
           (if (empty? c1)
             win
             (let [f (first c1)]
               (cond
-                (and (= nil win)    (= suit (f :suit)))    							(recur (rest c1) f)
-                (and (= nil win)    (not= suit (f :suit))) 							(recur (rest c1) win) 
-                (and (not= nil win) (= suit (f :suit))     (= (f :rank) rank)) 		(recur (rest c1) f)
-                (and (not= nil win) (= suit (f :suit))     (not= (f :rank) rank)) 	(recur (rest c1) win)
-                (and (not= nil win) (not= suit (f :suit)))							(recur (rest c1) win))
-              )))))
-    ))
+                (and (= nil win)    (= i (f :suit)))                                 (recur (rest c1) f)
+                (and (= nil win)    (not= i (f :suit)))                              (recur (rest c1) win)
+                (and (not= nil win) (= i (f :suit)) (> (f :rank) (win :rank)))       (recur (rest c1) f)
+                (and (not= nil win) (= i (f :suit)) (not (> (f :rank) (win :rank)))) (recur (rest c1) win)
+                (and (not= nil win) (not= i (f :suit)))                              (recur (rest c1) win))))))
+    (map? i)
+      (fn win-from-map [c]
+        (let [{suit :suit, rank :rank} i]
+          (loop [c1 c, win nil]
+            (if (empty? c1)
+              win
+              (let [f (first c1)]
+                (cond
+                  (and (= nil win)    (= suit (f :suit)))                           (recur (rest c1) f)
+                  (and (= nil win)    (not= suit (f :suit)))                        (recur (rest c1) win) 
+                  (and (not= nil win) (= suit (f :suit))     (= (f :rank) rank))    (recur (rest c1) f)
+                  (and (not= nil win) (= suit (f :suit))     (not= (f :rank) rank)) (recur (rest c1) win)
+                  (and (not= nil win) (not= suit (f :suit)))                        (recur (rest c1) win)))))))))
 
 ;;Tests
 
